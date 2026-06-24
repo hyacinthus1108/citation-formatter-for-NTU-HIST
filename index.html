@@ -137,16 +137,17 @@ textarea{resize:vertical;min-height:75px;}
     <span style="font-size:.68rem;background:rgba(255,255,255,.1);color:#9a9690;padding:.2rem .65rem;border-radius:20px;letter-spacing:.07em;font-family:'EB Garamond',serif;white-space:nowrap;border:1px solid rgba(255,255,255,.12)">v26.26.3</span>
 </header>
 <nav>
-  <button class="nav-btn active" onclick="gotoTab('cjk-book',this)">中日韓專書</button>
-  <button class="nav-btn" onclick="gotoTab('cjk-article',this)">中日韓論文</button>
+  <button class="nav-btn active" onclick="gotoTab('cjk-book',this)">專書</button>
+  <button class="nav-btn" onclick="gotoTab('cjk-article',this)">期刊</button>
+  <button class="nav-btn" onclick="gotoTab('cjk-thesis',this)">論文</button>
   <button class="nav-btn" onclick="gotoTab('cjk-chapter',this)">書中章節</button>
   <button class="nav-btn" onclick="gotoTab('cjk-news',this)">報紙</button>
   <button class="nav-btn" onclick="gotoTab('cjk-archive',this)">檔案</button>
   <button class="nav-btn" onclick="gotoTab('cjk-classic',this)">古籍</button>
   <button class="nav-btn" onclick="gotoTab('web',this)">網路資料</button>
   <button class="nav-btn" onclick="gotoTab('west-book',this)">西文專書</button>
-  <button class="nav-btn" onclick="gotoTab('west-article',this)">西文論文</button>
-  <button class="nav-btn" onclick="gotoTab('west-thesis',this)">西文學位論文</button>
+  <button class="nav-btn" onclick="gotoTab('west-article',this)">西文期刊</button>
+  <button class="nav-btn" onclick="gotoTab('west-thesis',this)">西文論文</button>
   <button class="nav-btn" onclick="gotoTab('bulk',this)">大量轉換</button>
   <button class="nav-btn clipboard-btn" onclick="gotoTab('clipboard',this)">剪貼簿</button>
 </nav>
@@ -179,7 +180,7 @@ textarea{resize:vertical;min-height:75px;}
   <div class="section-hd">作者資訊</div>
   <div id="ca-authors" class="author-list"></div>
   <button class="add-author-btn" onclick="addAuthor('ca-authors','ca')">＋ 新增作者</button>
-  <div class="section-hd">論文資訊</div>
+  <div class="section-hd">期刊資訊</div>
   <div class="form-grid">
     <div class="field full"><label>篇名<span class="req">*</span></label><input type="text" id="ca-title" placeholder="胡適與羅爾綱"></div>
     <div class="field full"><label>刊物名稱<span class="req">*</span></label><input type="text" id="ca-journal" placeholder="國立臺灣大學文史哲學報"></div>
@@ -194,6 +195,27 @@ textarea{resize:vertical;min-height:75px;}
   </div>
   <div class="err" id="ca-err"></div>
   <div class="output-wrap" id="ca-out" style="display:none"></div>
+</div>
+
+<!-- CJK THESIS -->
+<div id="tab-cjk-thesis" class="panel">
+  <div class="section-hd">作者資訊</div>
+  <div id="ct-authors" class="author-list"></div>
+  <button class="add-author-btn" onclick="addAuthor('ct-authors','ct')">＋ 新增作者</button>
+  <div class="section-hd">論文資訊</div>
+  <div class="form-grid">
+    <div class="field full"><label>論文名稱<span class="req">*</span></label><input type="text" id="ct-title" placeholder="植民地都市台北における日本人の生活文化"></div>
+    <div class="field"><label>出版地（選填）</label><input type="text" id="ct-place" placeholder="臺北"></div>
+    <div class="field"><label>論文出版處<span class="req">*</span></label><input type="text" id="ct-pub" placeholder="國立臺灣大學歷史學系碩士論文"></div>
+    <div class="field"><label>出版年份<span class="req">*</span></label><input type="text" id="ct-year" placeholder="2009"></div>
+    <div class="field full"><label>頁碼（選填）</label><input type="text" id="ct-page" placeholder="31-32（系統自動轉換）"></div>
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-primary" onclick="gen('cjk-thesis')">產生格式</button>
+    <button class="btn btn-secondary" onclick="clearForm('ct')">清除</button>
+  </div>
+  <div class="err" id="ct-err"></div>
+  <div class="output-wrap" id="ct-out" style="display:none"></div>
 </div>
 
 <!-- CJK CHAPTER -->
@@ -440,7 +462,7 @@ const clipboard = { fn: [], bib: [] };
 let dragSrc = null;
 
 window.addEventListener('DOMContentLoaded', () => {
-  [['cb','cjk'],['ca','cjk'],['cc','cjk'],['wb2','west'],['wa','west'],['wt','west']].forEach(([p,t]) => {
+  [['cb','cjk'],['ca','cjk'],['cc','cjk'],['ct','cjk'],['wb2','west'],['wa','west'],['wt','west']].forEach(([p,t]) => {
     authorCounters[p] = 0;
     const listId = p+'-authors';
     t === 'cjk' ? addAuthor(listId,p) : addWestAuthor(listId,p);
@@ -702,7 +724,7 @@ function updateClipBadge() {
 function gen(type) {
   const fns = {
     'cjk-book':genCjkBook,'cjk-article':genCjkArticle,'cjk-chapter':genCjkChapter,
-    'cjk-news':genCjkNews,'cjk-archive':genCjkArchive,'cjk-classic':genCjkClassic,
+    'cjk-thesis':genCjkThesis,'cjk-news':genCjkNews,'cjk-archive':genCjkArchive,'cjk-classic':genCjkClassic,
     'web':genWeb,'west-book':genWestBook,'west-article':genWestArticle,'west-thesis':genWestThesis
   };
   if (fns[type]) fns[type]();
@@ -731,7 +753,7 @@ function genCjkBook() {
   ]);
 }
 
-// CJK ARTICLE
+// CJK ARTICLE (期刊)
 function genCjkArticle() {
   const authors=collectAuthors('ca'),title=v('ca-title'),journal=v('ca-journal'),
         voliss=v('ca-voliss'),year=v('ca-year'),month=v('ca-month'),page=v('ca-page');
@@ -740,10 +762,34 @@ function genCjkArticle() {
   const authorStr=cjkAuthorStr(authors);
   const pageStr=page?fmtPageCJK(page):'';
   const datePart=month?`${year}年${month}月`:`${year}年`;
+  // 註腳：作者，〈篇名〉，《刊物》卷期（年月），頁X。
   const fn=`${authorStr}，〈${title}〉，《${journal}》${voliss}（${datePart}），頁${pageStr}。`;
-  const bib=`${authorStr}，〈${title}〉，《${journal}》${voliss}，${datePart}，頁${pageStr}。`;
+  // 書目：作者，〈篇名〉，收入《刊物》，頁X。年月。
+  const bib=`${authorStr}，〈${title}〉，收入《${journal}》${voliss}，頁${pageStr}。${datePart}。`;
   const short=`${authorStr}，〈${title}〉，頁${pageStr}。`;
   showOut('ca',[
+    {type:'footnote',html:fn,plain:fn},
+    {type:'short',html:short,plain:short},
+    {type:'bib',html:bib,plain:bib}
+  ]);
+}
+
+// CJK THESIS (學位論文)
+function genCjkThesis() {
+  const authors=collectAuthors('ct'),title=v('ct-title'),place=v('ct-place'),
+        pub=v('ct-pub'),year=v('ct-year'),page=v('ct-page');
+  if (!authors.length||!title||!pub||!year) return showErr('ct','請填寫必填欄位：作者、論文名稱、論文出版處、年份。');
+  hideErr('ct');
+  const authorStr=cjkAuthorStr(authors);
+  const pageStr=page?fmtPageCJK(page):'';
+  // 註腳：作者，〈論文名稱〉（出版地：出版處，年份），頁X。
+  const pubInner=place?`${place}：${pub}，${year}`:`${pub}，${year}`;
+  const fn=`${authorStr}，〈${title}〉（${pubInner}）${pageStr?'，頁'+pageStr:''}。`;
+  // 書目：作者，〈論文名稱〉。出版地：出版處，年份。頁X。
+  const bibPlace=place?`${place}：${pub}`:`${pub}`;
+  const bib=`${authorStr}，〈${title}〉。${bibPlace}，${year}。${pageStr?'頁'+pageStr+'。':''}`;
+  const short=`${authorStr}，〈${title}〉${pageStr?'，頁'+pageStr:''}。`;
+  showOut('ct',[
     {type:'footnote',html:fn,plain:fn},
     {type:'short',html:short,plain:short},
     {type:'bib',html:bib,plain:bib}
