@@ -3,19 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>學報引用格式產生器</title>
+<title>臺大歷史學報格式產生器</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;500;600&family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&display=swap');
-:root{--ink:#1c1b18;--ink-mid:#3a3830;--ink-soft:#6a6860;--rule:#ccc8be;--rule-lt:#e8e4dc;--paper:#fdfcfa;--cream:#f5f2eb;--accent:#5c3a1e;--accent2:#8b5e3c;--accent-bg:#f0e8df;--green:#2a5a2a;--green-bg:#edf5ed;--red:#8b1a1a;--red-bg:#fdf0f0;--shadow:0 2px 12px rgba(0,0,0,.07);}
+:root{--ink:#1c1b18;--ink-mid:#3a3830;--ink-soft:#6a6860;--rule:#ccc8be;--rule-lt:#e8e4dc;--paper:#fdfcfa;--cream:#f5f2eb;--accent:#5c3a1e;--accent2:#8b5e3c;--accent-bg:#f0e8df;--green:#2a5a2a;--green-bg:#edf5ed;--red:#8b1a1a;--red-bg:#fdf0f0;--blue:#1a3a6a;--blue-bg:#edf0f8;}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Noto Serif TC','Times New Roman',serif;background:var(--cream);color:var(--ink);line-height:1.8;min-height:100vh;}
-header{background:var(--ink);color:var(--paper);padding:1.8rem 2rem 1.5rem;border-bottom:3px solid var(--accent);display:flex;align-items:baseline;gap:1.5rem;flex-wrap:wrap;}
+header{background:var(--ink);color:var(--paper);padding:1.8rem 2rem 1.5rem;border-bottom:3px solid var(--accent);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.8rem;}
 header h1{font-size:1.35rem;font-weight:600;letter-spacing:.1em;}
 header p{font-family:'EB Garamond',serif;font-size:.95rem;color:#9a9690;}
-nav{background:var(--paper);border-bottom:1px solid var(--rule);display:flex;overflow-x:auto;box-shadow:var(--shadow);position:sticky;top:0;z-index:100;}
+nav{background:var(--paper);border-bottom:1px solid var(--rule);display:flex;overflow-x:auto;box-shadow:0 2px 8px rgba(0,0,0,.06);position:sticky;top:0;z-index:100;}
 .nav-btn{font-family:'Noto Serif TC',serif;font-size:.78rem;letter-spacing:.06em;padding:.7rem 1rem;border:none;background:none;color:var(--ink-soft);cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;transition:color .15s,border-color .15s,background .15s;flex-shrink:0;}
 .nav-btn:hover{color:var(--ink-mid);background:var(--cream);}
 .nav-btn.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:600;}
+.nav-btn.clipboard-btn{color:var(--blue);}
+.nav-btn.clipboard-btn.active{color:var(--blue);border-bottom-color:var(--blue);}
 .container{max-width:860px;margin:0 auto;padding:2rem 1.5rem 5rem;}
 .panel{display:none;}.panel.active{display:block;}
 .section-hd{font-size:.7rem;letter-spacing:.12em;color:var(--accent);text-transform:uppercase;border-bottom:1px solid var(--rule-lt);padding-bottom:.4rem;margin:1.8rem 0 1.1rem;}
@@ -28,9 +30,6 @@ input[type=text],textarea,select{font-family:'Noto Serif TC','Times New Roman',s
 input[type=text]:focus,textarea:focus,select:focus{border-color:var(--accent2);box-shadow:0 0 0 2px rgba(92,58,30,.08);}
 textarea{resize:vertical;min-height:75px;}
 .hint{font-size:.72rem;color:var(--ink-soft);font-style:italic;}
-.toggle-row{display:flex;gap:1rem;flex-wrap:wrap;align-items:center;}
-.toggle-row label{display:flex;align-items:center;gap:.4rem;font-size:.84rem;color:var(--ink-mid);cursor:pointer;letter-spacing:.02em;}
-input[type=radio],input[type=checkbox]{accent-color:var(--accent);}
 .author-list{display:flex;flex-direction:column;gap:.5rem;}
 .author-row{display:grid;grid-template-columns:1fr auto auto;gap:.5rem;align-items:center;}
 .author-row select{width:90px;}
@@ -43,35 +42,99 @@ input[type=radio],input[type=checkbox]{accent-color:var(--accent);}
 .btn:disabled{opacity:.5;cursor:not-allowed;}
 .btn-primary{background:var(--accent);color:#fff;}
 .btn-primary:hover:not(:disabled){background:var(--accent2);}
-.btn-bib{background:#3a5a3a;color:#fff;}
-.btn-bib:hover:not(:disabled){background:#4a7a4a;}
 .btn-secondary{background:var(--rule-lt);color:var(--ink-mid);border:1px solid var(--rule);}
 .btn-secondary:hover{background:var(--rule);}
 .output-wrap{margin-top:1.8rem;}
-.output-card{background:var(--paper);border:1px solid var(--rule);border-left:3px solid var(--accent);border-radius:0 3px 3px 0;overflow:hidden;margin-bottom:1rem;}
-.output-card.bib-card{border-left-color:#3a5a3a;}
-.output-card.short-card{border-left-color:var(--green);border-color:#b0d0b0;}
-.output-hd{font-size:.7rem;letter-spacing:.1em;color:var(--ink-soft);padding:.6rem 1.1rem .4rem;border-bottom:1px solid var(--rule-lt);background:var(--cream);display:flex;justify-content:space-between;align-items:center;}
+.output-card{background:var(--paper);border:1px solid var(--rule);border-left:3px solid var(--accent);border-radius:0 3px 3px 0;overflow:hidden;margin-bottom:.8rem;}
+.output-card.bib-card{border-left-color:var(--green);}
+.output-card.short-card{border-left-color:#a0a000;border-color:#d0d080;}
+.output-hd{font-size:.7rem;letter-spacing:.1em;color:var(--ink-soft);padding:.5rem 1rem .4rem;border-bottom:1px solid var(--rule-lt);background:var(--cream);display:flex;justify-content:space-between;align-items:center;gap:.5rem;flex-wrap:wrap;}
 .output-card.bib-card .output-hd{background:var(--green-bg);color:var(--green);border-bottom-color:#d0e8d0;}
-.output-card.short-card .output-hd{background:var(--green-bg);color:var(--green);border-bottom-color:#d0e8d0;}
-.output-body{padding:1rem 1.1rem;font-family:'Noto Serif TC','Times New Roman',serif;font-size:.93rem;line-height:2;white-space:pre-wrap;word-break:break-word;}
+.output-card.short-card .output-hd{background:#fafae8;color:#707000;border-bottom-color:#e0e090;}
+.output-body{padding:.9rem 1rem;font-family:'Noto Serif TC','Times New Roman',serif;font-size:.93rem;line-height:2;white-space:pre-wrap;word-break:break-word;}
 .output-body u{text-decoration:underline;text-decoration-style:dotted;text-decoration-color:var(--accent2);}
-.copy-btn{font-size:.74rem;padding:.22rem .7rem;background:var(--accent-bg);border:1px solid var(--rule);color:var(--accent);border-radius:2px;cursor:pointer;font-family:'Noto Serif TC',serif;transition:background .15s;}
+.hd-actions{display:flex;gap:.4rem;align-items:center;flex-wrap:wrap;}
+.copy-btn{font-size:.72rem;padding:.2rem .65rem;background:var(--accent-bg);border:1px solid var(--rule);color:var(--accent);border-radius:2px;cursor:pointer;font-family:'Noto Serif TC',serif;transition:background .15s;}
 .copy-btn:hover{background:var(--rule);}
-.copy-ok{font-size:.74rem;color:var(--green);margin-left:.5rem;display:none;}
+.add-clip-btn{font-size:.72rem;padding:.2rem .65rem;border:1px solid currentColor;border-radius:2px;cursor:pointer;font-family:'Noto Serif TC',serif;transition:background .15s;background:none;}
+.add-clip-fn{color:var(--accent);}.add-clip-fn:hover{background:var(--accent-bg);}
+.add-clip-bib{color:var(--green);}.add-clip-bib:hover{background:var(--green-bg);}
+.copy-ok{font-size:.72rem;color:var(--green);display:none;}
 .italic-note{font-size:.76rem;color:var(--accent2);background:var(--accent-bg);border:1px solid #d4b8a0;border-radius:2px;padding:.4rem .8rem;margin-top:.4rem;}
 .err{font-size:.82rem;color:var(--red);background:var(--red-bg);border:1px solid #e0b0b0;border-radius:2px;padding:.5rem .8rem;margin-top:.8rem;display:none;}
 .warning{font-size:.8rem;color:#7a5a00;background:#fffbe8;border:1px solid #e0d080;border-radius:2px;padding:.55rem .9rem;margin-bottom:1rem;line-height:1.65;}
 .warning strong{color:#5a4000;}
+/* CLIPBOARD */
+.clip-tabs{display:flex;gap:0;border-bottom:2px solid var(--rule);margin-bottom:1.2rem;}
+.clip-tab{font-family:'Noto Serif TC',serif;font-size:.82rem;padding:.5rem 1.2rem;border:none;background:none;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;color:var(--ink-soft);letter-spacing:.05em;transition:color .15s,border-color .15s;}
+.clip-tab.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:600;}
+.clip-tab.bib-tab.active{color:var(--green);border-bottom-color:var(--green);}
+.clip-pane{display:none;}.clip-pane.active{display:block;}
+.clip-list{display:flex;flex-direction:column;gap:.5rem;min-height:60px;}
+.clip-item{background:var(--paper);border:1px solid var(--rule);border-left:3px solid var(--accent);border-radius:0 3px 3px 0;padding:.7rem 1rem;display:flex;gap:.7rem;align-items:flex-start;cursor:grab;user-select:none;transition:box-shadow .15s,opacity .15s;}
+.clip-item.bib-item{border-left-color:var(--green);}
+.clip-item.dragging{opacity:.4;box-shadow:0 4px 16px rgba(0,0,0,.15);}
+.clip-item.drag-over{border-top:2px solid var(--accent);}
+.clip-item.bib-item.drag-over{border-top-color:var(--green);}
+.clip-text{font-family:'Noto Serif TC','Times New Roman',serif;font-size:.88rem;line-height:1.8;flex:1;word-break:break-word;}
+.clip-text u{text-decoration:underline;text-decoration-style:dotted;text-decoration-color:var(--accent2);}
+.clip-del{width:22px;height:22px;border:none;background:none;color:#bbb;cursor:pointer;font-size:1rem;flex-shrink:0;line-height:1;padding:0;transition:color .15s;}
+.clip-del:hover{color:var(--red);}
+.clip-drag{color:#ccc;font-size:1.1rem;flex-shrink:0;cursor:grab;padding-top:.1rem;}
+.clip-empty{font-size:.83rem;color:var(--ink-soft);font-style:italic;padding:.8rem 0;}
+.clip-actions{display:flex;gap:.7rem;margin-top:1rem;align-items:center;flex-wrap:wrap;}
+.clip-count{font-size:.76rem;color:var(--ink-soft);}
 @keyframes spin{to{transform:rotate(360deg)}}
 .spinner{display:inline-block;width:13px;height:13px;border:2px solid var(--rule);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-left:.4rem;}
 @media(max-width:600px){.form-grid{grid-template-columns:1fr;}.full{grid-column:1;}header{padding:1.2rem 1rem;}}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:1000;display:flex;align-items:center;justify-content:center;padding:1rem;}
+.modal{background:var(--paper);max-width:560px;width:100%;border-radius:4px;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.25);}
+.modal-header{background:var(--ink);color:var(--paper);padding:1.4rem 1.8rem 1.2rem;border-bottom:3px solid var(--accent);}
+.modal-header h2{font-size:1.1rem;font-weight:600;letter-spacing:.08em;margin-bottom:.2rem;}
+.modal-header .version{font-size:.72rem;font-family:'EB Garamond',serif;color:#9a9690;letter-spacing:.06em;}
+.modal-body{padding:1.4rem 1.8rem;}
+.modal-body p{font-size:.88rem;line-height:1.9;color:var(--ink-mid);margin-bottom:.9rem;}
+.modal-body .notice{font-size:.82rem;background:var(--accent-bg);border-left:3px solid var(--accent);padding:.6rem .9rem;margin-bottom:.9rem;line-height:1.7;color:var(--ink-mid);}
+.modal-body .notice strong{color:var(--accent);}
+.modal-body .changelog{font-size:.8rem;background:var(--cream);border:1px solid var(--rule-lt);border-radius:2px;padding:.6rem .9rem;margin-bottom:1rem;line-height:1.7;}
+.modal-body .changelog .ver-label{font-weight:600;color:var(--ink);letter-spacing:.04em;}
+.modal-footer{padding:.8rem 1.8rem 1.4rem;display:flex;justify-content:flex-end;}
 </style>
 </head>
 <body>
+
+<div class="modal-overlay" id="welcome-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>臺大歷史學報格式產生器</h2>
+      <div class="version">Citation &amp; Bibliography Formatter for NTU Hist &nbsp;·&nbsp; v26.26.3</div>
+    </div>
+    <div class="modal-body">
+      <p>本工具依據<strong>臺大歷史學系學報格式規範</strong>及芝加哥大學出版手冊第17版（Chicago Manual of Style, 17th ed.）製作，提供註腳、書目、縮略引用格式的自動產生，以及書目剪貼簿功能。</p>
+      <div class="notice">
+        <strong>⚠ 請注意</strong><br>
+        本工具自動產生之格式<strong>可能存在錯誤</strong>，尤其是特殊文獻、罕見格式或複雜引用情況。請務必在使用前自行核對，確認符合規範後再引用。
+      </div>
+      <div class="changelog">
+        <div class="ver-label">v26.26.3 &nbsp;·&nbsp; 2026年6月</div>
+        🎉 初次亮相！從零到有，十一種文獻類型一網打盡——專書、論文、章節、報紙、檔案、古籍、網路資料，中日韓西文通通支援。附贈剪貼簿功能，可拖曳排序，讓你的書目整理不再是噩夢。大量轉換功能亦已上線（實驗性，請溫柔對待🙏）。
+      </div>
+      <p style="font-size:.8rem;color:var(--ink-soft);margin-bottom:0">發現錯誤或有格式修正建議？歡迎來信：<a href="mailto:B12103005@ntu.edu.tw" style="color:var(--accent);font-weight:600">B12103005@ntu.edu.tw</a></p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="closeModal()">我了解，開始使用</button>
+    </div>
+  </div>
+</div>
+
 <header>
-  <h1>學報引用格式產生器</h1>
-  <p>Citation &amp; Bibliography Formatter &#xB7; 歷史學門</p>
+  <h1>臺大歷史學報格式產生器</h1>
+  <div style="display:flex;flex-direction:column;gap:.3rem">
+      <p>Citation &amp; Bibliography Formatter for NTU Hist</p>
+    </div>
+    <span style="font-size:.68rem;background:rgba(255,255,255,.1);color:#9a9690;padding:.2rem .65rem;border-radius:20px;letter-spacing:.07em;font-family:'EB Garamond',serif;white-space:nowrap;border:1px solid rgba(255,255,255,.12)">v26.26.3</span>
 </header>
 <nav>
   <button class="nav-btn active" onclick="gotoTab('cjk-book',this)">中日韓專書</button>
@@ -85,6 +148,7 @@ input[type=radio],input[type=checkbox]{accent-color:var(--accent);}
   <button class="nav-btn" onclick="gotoTab('west-article',this)">西文論文</button>
   <button class="nav-btn" onclick="gotoTab('west-thesis',this)">西文學位論文</button>
   <button class="nav-btn" onclick="gotoTab('bulk',this)">大量轉換</button>
+  <button class="nav-btn clipboard-btn" onclick="gotoTab('clipboard',this)">剪貼簿</button>
 </nav>
 <div class="container">
 
@@ -96,20 +160,14 @@ input[type=radio],input[type=checkbox]{accent-color:var(--accent);}
   <div class="section-hd">書目資訊</div>
   <div class="form-grid">
     <div class="field full"><label>書名<span class="req">*</span></label><input type="text" id="cb-title" placeholder="南宋鹽榷──食鹽產銷與政府控制"></div>
-    <div class="field"><label>出版地</label><input type="text" id="cb-place" placeholder="臺北"></div>
+    <div class="field"><label>出版地</label><input type="text" id="cb-place" placeholder="臺北（留空不顯示）"></div>
     <div class="field"><label>出版者<span class="req">*</span></label><input type="text" id="cb-pub" placeholder="臺大出版中心"></div>
     <div class="field"><label>出版年份<span class="req">*</span></label><input type="text" id="cb-year" placeholder="2010"></div>
     <div class="field"><label>版次</label><input type="text" id="cb-edition" placeholder="初版（留空不顯示）"></div>
-    <div class="field full"><label>頁碼</label><input type="text" id="cb-page" placeholder="381 或 381-385 或 381 383（系統自動轉換格式）"><span class="hint">連續頁用連字號，不連續頁用空格隔開，系統自動整理為正確格式</span></div>
-  </div>
-  <div class="section-hd">書目格式選項</div>
-  <div class="toggle-row">
-    <label><input type="checkbox" id="cb-short"> 同時產生縮略引用格式</label>
-    <label><input type="checkbox" id="cb-pinyin"> 書目格式加入拼音（AI 自動轉換）</label>
+    <div class="field full"><label>頁碼</label><input type="text" id="cb-page" placeholder="381 或 381-385 或 381 383"><span class="hint">連續頁用連字號，不連續頁用空格隔開，系統自動轉換</span></div>
   </div>
   <div class="btn-row">
-    <button class="btn btn-primary" onclick="gen('cjk-book','footnote')">產生註腳格式</button>
-    <button class="btn btn-bib" onclick="gen('cjk-book','bib')">產生書目格式</button>
+    <button class="btn btn-primary" onclick="gen('cjk-book')">產生格式</button>
     <button class="btn btn-secondary" onclick="clearForm('cb')">清除</button>
   </div>
   <div class="err" id="cb-err"></div>
@@ -125,19 +183,13 @@ input[type=radio],input[type=checkbox]{accent-color:var(--accent);}
   <div class="form-grid">
     <div class="field full"><label>篇名<span class="req">*</span></label><input type="text" id="ca-title" placeholder="胡適與羅爾綱"></div>
     <div class="field full"><label>刊物名稱<span class="req">*</span></label><input type="text" id="ca-journal" placeholder="國立臺灣大學文史哲學報"></div>
-    <div class="field full"><label>卷期（自填，依刊物慣例）</label><input type="text" id="ca-voliss" placeholder="第42期 或 第5卷第2期 或 52卷3期"></div>
+    <div class="field full"><label>卷期（依刊物慣例自填）</label><input type="text" id="ca-voliss" placeholder="第42期 或 第5卷第2期"></div>
     <div class="field"><label>年份<span class="req">*</span></label><input type="text" id="ca-year" placeholder="1995"></div>
     <div class="field"><label>月份</label><input type="text" id="ca-month" placeholder="4（留空不顯示）"></div>
-    <div class="field full"><label>頁碼</label><input type="text" id="ca-page" placeholder="76-78 或 76 78（系統自動轉換）"></div>
-  </div>
-  <div class="section-hd">書目格式選項</div>
-  <div class="toggle-row">
-    <label><input type="checkbox" id="ca-short"> 同時產生縮略引用格式</label>
-    <label><input type="checkbox" id="ca-pinyin"> 書目格式加入拼音（AI 自動轉換）</label>
+    <div class="field full"><label>頁碼</label><input type="text" id="ca-page" placeholder="76-78 或 76 78"></div>
   </div>
   <div class="btn-row">
-    <button class="btn btn-primary" onclick="gen('cjk-article','footnote')">產生註腳格式</button>
-    <button class="btn btn-bib" onclick="gen('cjk-article','bib')">產生書目格式</button>
+    <button class="btn btn-primary" onclick="gen('cjk-article')">產生格式</button>
     <button class="btn btn-secondary" onclick="clearForm('ca')">清除</button>
   </div>
   <div class="err" id="ca-err"></div>
@@ -152,21 +204,15 @@ input[type=radio],input[type=checkbox]{accent-color:var(--accent);}
   <div class="section-hd">章節資訊</div>
   <div class="form-grid">
     <div class="field full"><label>章節篇名<span class="req">*</span></label><input type="text" id="cc-title" placeholder="誰的「日本時代」？"></div>
-    <div class="field full"><label>編者（如有，含職稱，如：洪郁如編）</label><input type="text" id="cc-editor" placeholder="洪郁如編"></div>
+    <div class="field full"><label>編者（含職稱，如：洪郁如編）</label><input type="text" id="cc-editor" placeholder="洪郁如編（留空不顯示）"></div>
     <div class="field full"><label>書名<span class="req">*</span></label><input type="text" id="cc-book" placeholder="台灣史叢論 女性篇：性別與權力"></div>
-    <div class="field"><label>出版地</label><input type="text" id="cc-place" placeholder="臺北"></div>
+    <div class="field"><label>出版地</label><input type="text" id="cc-place" placeholder="臺北（留空不顯示）"></div>
     <div class="field"><label>出版者<span class="req">*</span></label><input type="text" id="cc-pub" placeholder="臺大出版中心"></div>
     <div class="field"><label>出版年份<span class="req">*</span></label><input type="text" id="cc-year" placeholder="2022"></div>
-    <div class="field full"><label>頁碼</label><input type="text" id="cc-page" placeholder="177-179 208（不連續頁用空格隔開）"></div>
-  </div>
-  <div class="section-hd">書目格式選項</div>
-  <div class="toggle-row">
-    <label><input type="checkbox" id="cc-short"> 同時產生縮略引用格式</label>
-    <label><input type="checkbox" id="cc-pinyin"> 書目格式加入拼音（AI 自動轉換）</label>
+    <div class="field full"><label>頁碼</label><input type="text" id="cc-page" placeholder="177-179 208（不連續頁空格隔開）"></div>
   </div>
   <div class="btn-row">
-    <button class="btn btn-primary" onclick="gen('cjk-chapter','footnote')">產生註腳格式</button>
-    <button class="btn btn-bib" onclick="gen('cjk-chapter','bib')">產生書目格式</button>
+    <button class="btn btn-primary" onclick="gen('cjk-chapter')">產生格式</button>
     <button class="btn btn-secondary" onclick="clearForm('cc')">清除</button>
   </div>
   <div class="err" id="cc-err"></div>
@@ -182,8 +228,7 @@ input[type=radio],input[type=checkbox]{accent-color:var(--accent);}
     <div class="field"><label>版次</label><input type="text" id="cn-edition" placeholder="4（系統自動加「版」）"></div>
   </div>
   <div class="btn-row">
-    <button class="btn btn-primary" onclick="gen('cjk-news','footnote')">產生註腳格式</button>
-    <button class="btn btn-bib" onclick="gen('cjk-news','bib')">產生書目格式</button>
+    <button class="btn btn-primary" onclick="gen('cjk-news')">產生格式</button>
     <button class="btn btn-secondary" onclick="clearForm('cn')">清除</button>
   </div>
   <div class="err" id="cn-err"></div>
@@ -204,8 +249,7 @@ input[type=radio],input[type=checkbox]{accent-color:var(--accent);}
     <div class="field"><label>點閱日期</label><input type="text" id="ar-access" placeholder="2025年12月24日"></div>
   </div>
   <div class="btn-row">
-    <button class="btn btn-primary" onclick="gen('cjk-archive','footnote')">產生註腳格式</button>
-    <button class="btn btn-bib" onclick="gen('cjk-archive','bib')">產生書目格式</button>
+    <button class="btn btn-primary" onclick="gen('cjk-archive')">產生格式</button>
     <button class="btn btn-secondary" onclick="clearForm('ar')">清除</button>
   </div>
   <div class="err" id="ar-err"></div>
@@ -219,9 +263,9 @@ input[type=radio],input[type=checkbox]{accent-color:var(--accent);}
     <div class="field"><label>書名<span class="req">*</span></label><input type="text" id="cl-title" placeholder="列女傳"></div>
     <div class="field full">
       <label>版本類型</label>
-      <div class="toggle-row" style="margin-top:.3rem">
-        <label><input type="radio" name="cl-type" value="original" checked onchange="toggleClassic()"> 原版古籍</label>
-        <label><input type="radio" name="cl-type" value="reprint" onchange="toggleClassic()"> 影印版古籍</label>
+      <div style="display:flex;gap:1.5rem;margin-top:.3rem">
+        <label style="display:flex;align-items:center;gap:.4rem;font-size:.84rem;color:var(--ink-mid);cursor:pointer"><input type="radio" name="cl-type" value="original" checked onchange="toggleClassic()"> 原版古籍</label>
+        <label style="display:flex;align-items:center;gap:.4rem;font-size:.84rem;color:var(--ink-mid);cursor:pointer"><input type="radio" name="cl-type" value="reprint" onchange="toggleClassic()"> 影印版古籍</label>
       </div>
     </div>
     <div class="field full" id="cl-orig-block"><label>版本說明<span class="req">*</span></label><textarea id="cl-orig-desc" placeholder="道光17年振綺堂原雕，同治13年補刊，梁端校讀本"></textarea></div>
@@ -230,8 +274,7 @@ input[type=radio],input[type=checkbox]{accent-color:var(--accent);}
     <div class="field"><label>頁碼<span class="req">*</span></label><input type="text" id="cl-page" placeholder="12"></div>
   </div>
   <div class="btn-row">
-    <button class="btn btn-primary" onclick="gen('cjk-classic','footnote')">產生註腳格式</button>
-    <button class="btn btn-bib" onclick="gen('cjk-classic','bib')">產生書目格式</button>
+    <button class="btn btn-primary" onclick="gen('cjk-classic')">產生格式</button>
     <button class="btn btn-secondary" onclick="clearForm('cl')">清除</button>
   </div>
   <div class="err" id="cl-err"></div>
@@ -248,11 +291,10 @@ input[type=radio],input[type=checkbox]{accent-color:var(--accent);}
     <div class="field full"><label>網址<span class="req">*</span></label><input type="text" id="wb-url" placeholder="https://..."></div>
     <div class="field"><label>點閱日期<span class="req">*</span></label><input type="text" id="wb-access" placeholder="2025年12月24日"></div>
     <div class="field"><label>日期動詞</label><select id="wb-verb"><option>點閱</option><option>檢索</option><option>瀏覽</option></select></div>
-    <div class="field full"><label>頁碼（如有）</label><input type="text" id="wb-page" placeholder="189-213（系統自動轉換）"></div>
+    <div class="field full"><label>頁碼（如有）</label><input type="text" id="wb-page" placeholder="189-213"></div>
   </div>
   <div class="btn-row">
-    <button class="btn btn-primary" onclick="gen('web','footnote')">產生註腳格式</button>
-    <button class="btn btn-bib" onclick="gen('web','bib')">產生書目格式</button>
+    <button class="btn btn-primary" onclick="gen('web')">產生格式</button>
     <button class="btn btn-secondary" onclick="clearForm('wb')">清除</button>
   </div>
   <div class="err" id="wb-err"></div>
@@ -267,19 +309,14 @@ input[type=radio],input[type=checkbox]{accent-color:var(--accent);}
   <div class="section-hd">書目資訊</div>
   <div class="form-grid">
     <div class="field full"><label>書名（斜體）<span class="req">*</span></label><input type="text" id="wb2-title" placeholder="The German Forest: Nature, Identity and the Contestation of a National Symbol, 1871–1914"></div>
-    <div class="field"><label>出版地</label><input type="text" id="wb2-place" placeholder="Toronto"></div>
+    <div class="field"><label>出版地</label><input type="text" id="wb2-place" placeholder="Toronto（留空不顯示）"></div>
     <div class="field"><label>出版者<span class="req">*</span></label><input type="text" id="wb2-pub" placeholder="University of Toronto Press"></div>
     <div class="field"><label>出版年份<span class="req">*</span></label><input type="text" id="wb2-year" placeholder="2016"></div>
     <div class="field full"><label>頁碼</label><input type="text" id="wb2-page" placeholder="4-6 或 50（系統自動判斷 p./pp.，百位數自動省略）"></div>
   </div>
-  <div class="section-hd">格式選項</div>
-  <div class="toggle-row">
-    <label><input type="checkbox" id="wb2-short"> 同時產生縮略引用格式</label>
-  </div>
-  <div class="italic-note" style="margin-top:.8rem">書名欄位以<u>虛線底線</u>標示，複製後請在 Word 中手動設定為斜體。</div>
+  <div class="italic-note" style="margin-top:.8rem">書名以<u>虛線底線</u>標示，複製後請在 Word 中手動設定為斜體。</div>
   <div class="btn-row">
-    <button class="btn btn-primary" onclick="gen('west-book','footnote')">產生註腳格式</button>
-    <button class="btn btn-bib" onclick="gen('west-book','bib')">產生書目格式</button>
+    <button class="btn btn-primary" onclick="gen('west-book')">產生格式</button>
     <button class="btn btn-secondary" onclick="clearForm('wb2')">清除</button>
   </div>
   <div class="err" id="wb2-err"></div>
@@ -295,19 +332,14 @@ input[type=radio],input[type=checkbox]{accent-color:var(--accent);}
   <div class="form-grid">
     <div class="field full"><label>篇名<span class="req">*</span></label><input type="text" id="wa-title" placeholder="Introduction: Toward an Urban History of Science"></div>
     <div class="field full"><label>期刊名稱（斜體）<span class="req">*</span></label><input type="text" id="wa-journal" placeholder="Osiris"></div>
-    <div class="field full"><label>卷期（自填，依刊物慣例）</label><input type="text" id="wa-voliss" placeholder="no. 18 或 vol. 31, no. 2"></div>
+    <div class="field full"><label>卷期（依刊物慣例自填）</label><input type="text" id="wa-voliss" placeholder="no. 18 或 vol. 31, no. 2"></div>
     <div class="field"><label>月份</label><input type="text" id="wa-month" placeholder="July（英文全名）"></div>
     <div class="field"><label>年份<span class="req">*</span></label><input type="text" id="wa-year" placeholder="2003"></div>
     <div class="field full"><label>頁碼</label><input type="text" id="wa-page" placeholder="1-19（系統自動轉換 p./pp.）"></div>
   </div>
-  <div class="section-hd">格式選項</div>
-  <div class="toggle-row">
-    <label><input type="checkbox" id="wa-short"> 同時產生縮略引用格式</label>
-  </div>
   <div class="italic-note" style="margin-top:.8rem">期刊名以<u>虛線底線</u>標示，複製後請在 Word 中手動設定為斜體。</div>
   <div class="btn-row">
-    <button class="btn btn-primary" onclick="gen('west-article','footnote')">產生註腳格式</button>
-    <button class="btn btn-bib" onclick="gen('west-article','bib')">產生書目格式</button>
+    <button class="btn btn-primary" onclick="gen('west-article')">產生格式</button>
     <button class="btn btn-secondary" onclick="clearForm('wa')">清除</button>
   </div>
   <div class="err" id="wa-err"></div>
@@ -328,8 +360,7 @@ input[type=radio],input[type=checkbox]{accent-color:var(--accent);}
     <div class="field full"><label>頁碼</label><input type="text" id="wt-page" placeholder="31-32（系統自動轉換）"></div>
   </div>
   <div class="btn-row">
-    <button class="btn btn-primary" onclick="gen('west-thesis','footnote')">產生註腳格式</button>
-    <button class="btn btn-bib" onclick="gen('west-thesis','bib')">產生書目格式</button>
+    <button class="btn btn-primary" onclick="gen('west-thesis')">產生格式</button>
     <button class="btn btn-secondary" onclick="clearForm('wt')">清除</button>
   </div>
   <div class="err" id="wt-err"></div>
@@ -340,24 +371,19 @@ input[type=radio],input[type=checkbox]{accent-color:var(--accent);}
 <div id="tab-bulk" class="panel">
   <div class="warning">
     <strong>⚠ 使用前請詳閱</strong><br>
-    本功能使用 AI 解析，請確保貼入的每一條引用資料<strong>不含作者附加說明文字</strong>（如「關於此點可參見……」、「此書對……有詳盡討論」等），否則解析結果將不準確。建議轉換後逐條核對。<br><br>
+    請確保貼入的每一條引用資料<strong>不含作者附加說明文字</strong>，否則解析結果將不準確。建議轉換後逐條核對。<br><br>
     <strong>書目排序提醒：</strong>書目應依下列順序分類：<br>
     一、文獻史料（檔案、原典、考古報告等）依時代先後排序。<br>
     二、近人著作：中日韓文在前（依作者姓氏筆劃排序）、西文在後（依姓氏字母排序）。同一作者著作年代早者在前。<br>
-    本工具<strong>不自動排序</strong>，請使用者依上述原則自行整理。
+    本工具<strong>不自動排序</strong>，請依上述原則自行整理。
   </div>
-  <div style="margin-bottom:1.2rem">
-    <div class="toggle-row">
-      <label><input type="radio" name="bulk-mode" value="footnote-to-bib" checked> 註腳格式 → 書目格式</label>
-      <label><input type="radio" name="bulk-mode" value="lib-to-bib"> 圖書館書目格式 → 學報書目格式</label>
-    </div>
+  <div style="margin-bottom:1.2rem;display:flex;gap:1.5rem;flex-wrap:wrap">
+    <label style="display:flex;align-items:center;gap:.4rem;font-size:.84rem;color:var(--ink-mid);cursor:pointer"><input type="radio" name="bulk-mode" value="footnote-to-bib" checked> 註腳格式 → 書目格式</label>
+    <label style="display:flex;align-items:center;gap:.4rem;font-size:.84rem;color:var(--ink-mid);cursor:pointer"><input type="radio" name="bulk-mode" value="lib-to-bib"> 圖書館書目格式 → 學報書目格式</label>
   </div>
   <div class="field" style="margin-bottom:1rem">
     <label>貼入引用資料（每條以換行分隔）<span class="req">*</span></label>
     <textarea id="bulk-input" style="min-height:180px" placeholder="梁庚堯，《南宋鹽榷──食鹽產銷與政府控制》（臺北：臺大出版中心，2010），頁381。&#10;潘光哲，〈胡適與羅爾綱〉，《國立臺灣大學文史哲學報》第42期（1995年4月），頁76-78。"></textarea>
-  </div>
-  <div class="toggle-row" style="margin-bottom:1rem">
-    <label><input type="checkbox" id="bulk-pinyin"> 同時產生拼音（中日韓文）— AI 自動轉換，請務必人工核對</label>
   </div>
   <div class="btn-row">
     <button class="btn btn-primary" id="bulk-btn" onclick="runBulk()">開始轉換</button>
@@ -365,25 +391,61 @@ input[type=radio],input[type=checkbox]{accent-color:var(--accent);}
   </div>
   <div class="err" id="bulk-err"></div>
   <div id="bulk-out" style="display:none;margin-top:1.5rem">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.7rem">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.7rem;flex-wrap:wrap;gap:.5rem">
       <span style="font-size:.78rem;color:var(--ink-soft)">轉換結果（請逐條核對後使用）</span>
-      <button class="copy-btn" onclick="copyAll()">複製全部</button>
+      <div style="display:flex;gap:.5rem">
+        <button class="copy-btn" onclick="copyAllBulk()">複製全部</button>
+        <button class="copy-btn" style="color:var(--green);border-color:var(--green)" onclick="addAllBulkToClip()">全部加入書目剪貼簿</button>
+      </div>
     </div>
     <div id="bulk-results"></div>
   </div>
 </div>
 
+<!-- CLIPBOARD -->
+<div id="tab-clipboard" class="panel">
+  <div class="clip-tabs">
+    <button class="clip-tab active" onclick="switchClipTab('fn',this)">📋 註腳區</button>
+    <button class="clip-tab bib-tab" onclick="switchClipTab('bib',this)">📚 書目區</button>
+  </div>
+  <div id="clip-fn-pane" class="clip-pane active">
+    <div class="clip-list" id="clip-fn-list"></div>
+    <div class="clip-actions">
+      <button class="btn btn-primary" onclick="copyClip('fn')">複製全部註腳</button>
+      <button class="btn btn-secondary" onclick="clearClip('fn')">清空</button>
+      <span class="clip-count" id="clip-fn-count"></span>
+    </div>
+  </div>
+  <div id="clip-bib-pane" class="clip-pane">
+    <div class="clip-list" id="clip-bib-list"></div>
+    <div class="clip-actions">
+      <button class="btn btn-primary" style="background:var(--green)" onclick="copyClip('bib')">複製全部書目</button>
+      <button class="btn btn-secondary" onclick="clearClip('bib')">清空</button>
+      <span class="clip-count" id="clip-bib-count"></span>
+    </div>
+  </div>
+</div>
+
 </div>
 <script>
+
+// ── MODAL ──
+function closeModal() {
+  document.getElementById('welcome-modal').style.display = 'none';
+}
+
 // ── GLOBALS ──
 const authorCounters = {};
+const clipboard = { fn: [], bib: [] };
+let dragSrc = null;
 
 window.addEventListener('DOMContentLoaded', () => {
   [['cb','cjk'],['ca','cjk'],['cc','cjk'],['wb2','west'],['wa','west'],['wt','west']].forEach(([p,t]) => {
     authorCounters[p] = 0;
-    const listId = {cb:'cb-authors',ca:'ca-authors',cc:'cc-authors',wb2:'wb2-authors',wa:'wa-authors',wt:'wt-authors'}[p];
+    const listId = p+'-authors';
     t === 'cjk' ? addAuthor(listId,p) : addWestAuthor(listId,p);
   });
+  renderClip('fn'); renderClip('bib');
 });
 
 // ── NAV ──
@@ -405,7 +467,6 @@ function addAuthor(listId, prefix) {
     <button class="icon-btn" onclick="removeRow('${prefix}-arow-${idx}')" title="移除">✕</button>`;
   document.getElementById(listId).appendChild(row);
 }
-
 function addWestAuthor(listId, prefix) {
   if (!authorCounters[prefix]) authorCounters[prefix] = 0;
   const idx = authorCounters[prefix]++;
@@ -416,73 +477,55 @@ function addWestAuthor(listId, prefix) {
     <button class="icon-btn" onclick="removeRow('${prefix}-arow-${idx}')" title="Remove">✕</button>`;
   document.getElementById(listId).appendChild(row);
 }
-
 function removeRow(id) { document.getElementById(id)?.remove(); }
-
 function collectAuthors(prefix) {
   return Array.from(document.querySelectorAll(`[id^="${prefix}-arow-"]`)).map(row => {
     const idx = row.id.split('-').pop();
     const name = (document.getElementById(`${prefix}-aname-${idx}`)?.value||'').trim();
     const role = (document.getElementById(`${prefix}-arole-${idx}`)?.value||'').trim();
-    return name ? {name, role} : null;
+    return name ? {name,role} : null;
   }).filter(Boolean);
 }
 
-// ── PAGE NUMBER FORMATTING ──
+// ── PAGE FORMATTING ──
 function fmtPageCJK(raw) {
   if (!raw) return '';
-  // normalise dashes → en-dash
-  let s = raw.replace(/\s*[-\u2012\u2013\u2014\uff0d]+\s*/g, '\u2013');
-  // split on space or 、
-  const tokens = s.split(/[\s\u3001]+/).filter(Boolean);
-  if (!tokens.length) return '';
-  return tokens.length === 1 ? tokens[0] : tokens.join('\u3001');
+  let s = raw.replace(/\s*[-‒–—－]+\s*/g, '–');
+  const tokens = s.split(/[\s、]+/).filter(Boolean);
+  return tokens.length === 1 ? tokens[0] : tokens.join('、');
 }
-
 function fmtPageWest(raw) {
   if (!raw) return '';
-  let s = raw.replace(/\s*[-\u2012\u2013\u2014\uff0d]+\s*/g, '\u2013').trim();
-  const tokens = s.split(/[\s,\u3001]+/).filter(Boolean);
+  let s = raw.replace(/\s*[-‒–—－]+\s*/g, '–').trim();
+  const tokens = s.split(/[\s,、]+/).filter(Boolean);
   if (!tokens.length) return '';
   if (tokens.length === 1) {
-    if (tokens[0].includes('\u2013')) {
-      const [a,b] = tokens[0].split('\u2013');
-      return `pp.${a.trim()}\u2013${abbr(a.trim(),b.trim())}.`;
+    if (tokens[0].includes('–')) {
+      const [a,b] = tokens[0].split('–');
+      return `pp.${a.trim()}–${abbr(a.trim(),b.trim())}.`;
     }
     return `p.${tokens[0]}.`;
   }
-  const proc = tokens.map(t => {
-    if (t.includes('\u2013')) { const [a,b]=t.split('\u2013'); return `${a}\u2013${abbr(a,b)}`; }
-    return t;
-  });
-  return `pp.${proc.join(', ')}.`;
+  return `pp.${tokens.map(t => { if(t.includes('–')){const [a,b]=t.split('–');return `${a}–${abbr(a,b)}`;}return t;}).join(', ')}.`;
 }
-
-function abbr(start, end) {
-  if (start.length===3 && end.length===3 && start[0]===end[0]) return end.slice(1);
-  if (start.length===3 && end.length===2) return end;
-  return end;
+function abbr(s,e) {
+  if (s.length===3&&e.length===3&&s[0]===e[0]) return e.slice(1);
+  if (s.length===3&&e.length===2) return e;
+  return e;
 }
 
 // ── AUTHOR STRINGS ──
 function cjkAuthorStr(authors) {
   if (!authors.length) return '';
-  // Group consecutive authors by role
   const groups = [];
   let cur = null;
   authors.forEach(a => {
-    if (cur && cur.role === a.role) { cur.names.push(a.name); }
-    else { cur = {role: a.role, names: [a.name]}; groups.push(cur); }
+    if (cur && cur.role === a.role) cur.names.push(a.name);
+    else { cur = {role:a.role, names:[a.name]}; groups.push(cur); }
   });
-  // If only one group and role is 著, omit role label
-  if (groups.length === 1 && groups[0].role === '著') return groups[0].names.join('\u3001');
-  // Otherwise: join each group with 、, separate groups with ，and append role
-  return groups.map(g => {
-    const nameStr = g.names.join('\u3001');
-    return g.role === '著' ? nameStr + '\u8457' : nameStr + g.role;
-  }).join('\uff0c');
+  if (groups.length===1 && groups[0].role==='著') return groups[0].names.join('、');
+  return groups.map(g => g.names.join('、') + g.role).join('，');
 }
-
 function westFootnoteAuthor(authors) {
   const aut = authors.filter(a=>a.role==='author');
   const eds = authors.filter(a=>a.role==='editor');
@@ -493,7 +536,6 @@ function westFootnoteAuthor(authors) {
   if (!aut.length && eds.length) r += ` (ed${eds.length>1?'s':''}.)`;
   return r;
 }
-
 function westBibAuthor(authors) {
   const aut = authors.filter(a=>a.role==='author');
   const eds = authors.filter(a=>a.role==='editor');
@@ -506,57 +548,15 @@ function westBibAuthor(authors) {
   return r;
 }
 
-// ── OUTPUT ──
+// ── HELPERS ──
 function v(id){return (document.getElementById(id)?.value||'').trim();}
-function chk(id){return !!document.getElementById(id)?.checked;}
 function showErr(p,msg){const e=document.getElementById(p+'-err');if(e){e.textContent=msg;e.style.display='block';}}
 function hideErr(p){const e=document.getElementById(p+'-err');if(e)e.style.display='none';}
-
-function showOut(prefix, blocks) {
-  const wrap = document.getElementById(prefix+'-out');
-  wrap.style.display='block'; wrap.innerHTML='';
-  blocks.forEach(b => {
-    const card = document.createElement('div');
-    card.className = 'output-card'+(b.type==='bib'?' bib-card':b.type==='short'?' short-card':'');
-    const okId = 'ok-'+Math.random().toString(36).slice(2);
-    const labelMap = {footnote:'註腳格式',bib:'書目格式',short:'縮略引用'};
-    card.innerHTML = `<div class="output-hd"><span>${labelMap[b.type]||b.label||''}</span>
-      <span><button class="copy-btn" onclick="copyText(this,'${okId}')">複製</button>
-      <span class="copy-ok" id="${okId}">已複製！</span></span></div>
-      <div class="output-body" data-plain="${encodeURIComponent(b.plain)}">${b.html}</div>`;
-    wrap.appendChild(card);
-    if (b.italicNote) {
-      const n=document.createElement('div');
-      n.className='italic-note';
-      n.textContent='⚠ 以虛線底線標示的文字（書名、期刊名）需在 Word 中手動設定為斜體。';
-      wrap.appendChild(n);
-    }
-    if (b.pinyinNote) {
-      const n=document.createElement('div');
-      n.className='italic-note';
-      n.textContent='⚠ 拼音為 AI 自動轉換，請務必人工核對，尤其人名、地名、專有名詞。';
-      wrap.appendChild(n);
-    }
-  });
-}
-
-function copyText(btn, okId) {
-  const body = btn.closest('.output-card').querySelector('.output-body');
-  const plain = decodeURIComponent(body.dataset.plain);
-  navigator.clipboard.writeText(plain).then(()=>{
-    const ok=document.getElementById(okId);
-    if(ok){ok.style.display='inline';setTimeout(()=>ok.style.display='none',2000);}
-  });
-}
-
-// ── CLASSIC TOGGLE ──
 function toggleClassic(){
   const t=document.querySelector('input[name="cl-type"]:checked')?.value;
   document.getElementById('cl-orig-block').style.display=t==='original'?'':'none';
   document.getElementById('cl-reprint-block').style.display=t==='reprint'?'':'none';
 }
-
-// ── CLEAR ──
 function clearForm(p){
   document.querySelectorAll(`[id^="${p}-"]`).forEach(el=>{
     if(el.tagName==='INPUT'&&el.type==='text')el.value='';
@@ -568,148 +568,222 @@ function clearForm(p){
   hideErr(p);
 }
 
-// ── PINYIN API ──
-async function getPinyin(items) {
-  // items: [{text, lang, role}] role: 'name'|'title'|'pub'|'place'
-  if (!items.length) return {};
-  const prompt = `You are a romanization assistant for a Taiwanese history journal.
-Convert each item to the appropriate romanization:
-- Chinese (zh): Use standard Hanyu Pinyin. For names in Taiwan academic context, use Wade-Giles (e.g. 顏杏如 → Yen Hsin-ju, 王鳴盛 → Wang Ming-sheng). For titles and publishers: Hanyu Pinyin, capitalize first word only, spaces between syllables.
-- Japanese (ja): Use Hepburn romanization.
-- Korean (ko): Use McCune-Reischauer romanization.
-Respond ONLY with a JSON object mapping item IDs to romanized strings. No explanation.
-Items: ${JSON.stringify(items.map(i=>({id:i.id,text:i.text,lang:i.lang,role:i.role})))}`;
-  try {
-    const res = await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,messages:[{role:'user',content:prompt}]})
+// ── OUTPUT RENDERING ──
+function showOut(prefix, blocks) {
+  const wrap = document.getElementById(prefix+'-out');
+  wrap.style.display='block'; wrap.innerHTML='';
+  let hasItalic = false;
+  blocks.forEach(b => {
+    const card = document.createElement('div');
+    card.className = 'output-card'+(b.type==='bib'?' bib-card':b.type==='short'?' short-card':'');
+    const okId = 'ok-'+Math.random().toString(36).slice(2);
+    const labelMap = {footnote:'完整註腳',bib:'書目格式',short:'縮略引用'};
+    const clipType = b.type==='bib' ? 'bib' : 'fn';
+    const clipLabel = b.type==='bib' ? '加入書目剪貼簿' : '加入註腳剪貼簿';
+    const clipClass = b.type==='bib' ? 'add-clip-bib' : 'add-clip-fn';
+    // Use DOM methods to avoid quote escaping issues
+    const hd = document.createElement('div'); hd.className = 'output-hd';
+    const hdLabel = document.createElement('span'); hdLabel.textContent = labelMap[b.type]||'';
+    const hdActs = document.createElement('div'); hdActs.className = 'hd-actions';
+    const copyBtn = document.createElement('button'); copyBtn.className = 'copy-btn'; copyBtn.textContent = '複製';
+    const okSpan = document.createElement('span'); okSpan.className = 'copy-ok'; okSpan.id = okId; okSpan.textContent = '已複製！';
+    const clipBtn = document.createElement('button');
+    clipBtn.className = 'add-clip-btn ' + clipClass;
+    clipBtn.textContent = '＋ ' + clipLabel;
+    // Store data on elements
+    const body = document.createElement('div'); body.className = 'output-body';
+    body.innerHTML = b.html;
+    body._plain = b.plain; body._html = b.html;
+    copyBtn.addEventListener('click', () => {
+      navigator.clipboard.writeText(body._plain).then(()=>{
+        okSpan.style.display='inline'; setTimeout(()=>okSpan.style.display='none',2000);
+      });
     });
-    const data = await res.json();
-    const txt = data.content?.[0]?.text||'{}';
-    const clean = txt.replace(/```json|```/g,'').trim();
-    return JSON.parse(clean);
-  } catch(e){ return {}; }
+    clipBtn.addEventListener('click', () => {
+      clipboard[clipType].push({plain:body._plain, html:body._html});
+      renderClip(clipType); updateClipBadge();
+      clipBtn.textContent = '✓ 已加入'; clipBtn.disabled = true;
+      setTimeout(()=>{ clipBtn.textContent = '＋ '+clipLabel; clipBtn.disabled=false; }, 1500);
+    });
+    hdActs.appendChild(copyBtn); hdActs.appendChild(clipBtn); hdActs.appendChild(okSpan);
+    hd.appendChild(hdLabel); hd.appendChild(hdActs);
+    card.appendChild(hd); card.appendChild(body);
+    wrap.appendChild(card);
+    if (b.italicNote) hasItalic = true;
+  });
+  if (hasItalic) {
+    const n = document.createElement('div');
+    n.className = 'italic-note';
+    n.textContent = '⚠ 以虛線底線標示的文字（書名、期刊名）需在 Word 中手動設定為斜體。';
+    wrap.appendChild(n);
+  }
+}
+function copyText(btn, okId) {
+  const body = btn.closest('.output-card').querySelector('.output-body');
+  navigator.clipboard.writeText(decodeURIComponent(body.dataset.plain)).then(()=>{
+    const ok=document.getElementById(okId);
+    if(ok){ok.style.display='inline';setTimeout(()=>ok.style.display='none',2000);}
+  });
+}
+function addToClip(type, btn) {
+  const body = btn.closest('.output-card').querySelector('.output-body');
+  const plain = decodeURIComponent(body.dataset.plain);
+  const html = decodeURIComponent(body.dataset.html);
+  clipboard[type].push({plain, html});
+  renderClip(type);
+  updateClipBadge();
+  btn.textContent = '✓ 已加入';
+  btn.disabled = true;
+  setTimeout(()=>{ btn.textContent = type==='bib'?'＋ 加入書目剪貼簿':'＋ 加入註腳剪貼簿'; btn.disabled=false; }, 1500);
 }
 
-// ── DISPATCHER ──
-async function gen(type, mode) {
+// ── CLIPBOARD RENDERING ──
+function renderClip(type) {
+  const list = document.getElementById('clip-'+type+'-list');
+  const count = document.getElementById('clip-'+type+'-count');
+  list.innerHTML = '';
+  if (!clipboard[type].length) {
+    list.innerHTML = `<div class="clip-empty">尚無項目。產生格式後點「加入剪貼簿」即可加入。</div>`;
+    if (count) count.textContent = '';
+    return;
+  }
+  if (count) count.textContent = `共 ${clipboard[type].length} 筆`;
+  clipboard[type].forEach((item, i) => {
+    const div = document.createElement('div');
+    div.className = 'clip-item'+(type==='bib'?' bib-item':'');
+    div.draggable = true;
+    div.dataset.idx = i;
+    div.innerHTML = `<span class="clip-drag" title="拖曳排序">⠿</span>
+      <span class="clip-text">${item.html}</span>
+      <button class="clip-del" onclick="removeClipItem('${type}',${i})" title="刪除">✕</button>`;
+    // Drag events
+    div.addEventListener('dragstart', e => { dragSrc={type,idx:i}; div.classList.add('dragging'); });
+    div.addEventListener('dragend', () => div.classList.remove('dragging'));
+    div.addEventListener('dragover', e => { e.preventDefault(); div.classList.add('drag-over'); });
+    div.addEventListener('dragleave', () => div.classList.remove('drag-over'));
+    div.addEventListener('drop', e => {
+      e.preventDefault(); div.classList.remove('drag-over');
+      if (!dragSrc || dragSrc.type !== type || dragSrc.idx === i) return;
+      const arr = clipboard[type];
+      const [moved] = arr.splice(dragSrc.idx, 1);
+      arr.splice(i, 0, moved);
+      renderClip(type);
+    });
+    list.appendChild(div);
+  });
+}
+function removeClipItem(type, idx) {
+  clipboard[type].splice(idx, 1);
+  renderClip(type);
+  updateClipBadge();
+}
+function clearClip(type) {
+  clipboard[type] = [];
+  renderClip(type);
+  updateClipBadge();
+}
+function copyClip(type) {
+  const text = clipboard[type].map(i=>i.plain).join('\n');
+  navigator.clipboard.writeText(text);
+}
+function switchClipTab(type, btn) {
+  document.querySelectorAll('.clip-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.clip-pane').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('clip-'+type+'-pane').classList.add('active');
+}
+function updateClipBadge() {
+  const total = clipboard.fn.length + clipboard.bib.length;
+  const btn = document.querySelector('.nav-btn.clipboard-btn');
+  if (btn) btn.textContent = total > 0 ? `剪貼簿 (${total})` : '剪貼簿';
+}
+
+// ── GENERATORS ──
+function gen(type) {
   const fns = {
-    'cjk-book': genCjkBook, 'cjk-article': genCjkArticle,
-    'cjk-chapter': genCjkChapter, 'cjk-news': genCjkNews,
-    'cjk-archive': genCjkArchive, 'cjk-classic': genCjkClassic,
-    'web': genWeb, 'west-book': genWestBook,
-    'west-article': genWestArticle, 'west-thesis': genWestThesis
+    'cjk-book':genCjkBook,'cjk-article':genCjkArticle,'cjk-chapter':genCjkChapter,
+    'cjk-news':genCjkNews,'cjk-archive':genCjkArchive,'cjk-classic':genCjkClassic,
+    'web':genWeb,'west-book':genWestBook,'west-article':genWestArticle,'west-thesis':genWestThesis
   };
-  if (fns[type]) await fns[type](mode);
+  if (fns[type]) fns[type]();
 }
 
-// ── CJK BOOK ──
-async function genCjkBook(mode) {
-  const authors=collectAuthors('cb'), title=v('cb-title'), place=v('cb-place'),
-        pub=v('cb-pub'), year=v('cb-year'), edition=v('cb-edition'), page=v('cb-page');
+// CJK BOOK
+function genCjkBook() {
+  const authors=collectAuthors('cb'),title=v('cb-title'),place=v('cb-place'),
+        pub=v('cb-pub'),year=v('cb-year'),edition=v('cb-edition'),page=v('cb-page');
   if (!authors.length||!title||!pub||!year) return showErr('cb','請填寫必填欄位：作者、書名、出版者、年份。');
   hideErr('cb');
   const authorStr=cjkAuthorStr(authors);
-  const inside=[place?place+'\uff1a'+pub:pub, edition, year].filter(Boolean).join('\uff0c');
   const pageStr=page?fmtPageCJK(page):'';
-  const fn=`${authorStr}\uff0c\u300a${title}\u300b\uff08${inside}\uff09${pageStr?'\uff0c\u9801'+pageStr:''}\u3002`;
-  const bib=`${authorStr}\uff0c\u300a${title}\u300b\u3002\uff08${inside}\uff09\u3002${pageStr?'\u9801'+pageStr+'\u3002':''}`;
-  const blocks=[];
-  if (mode==='footnote') {
-    blocks.push({type:'footnote',html:fn,plain:fn});
-    if (chk('cb-short')) { const s=`${authorStr}\uff0c\u300a${title}\u300b\uff0c\u9801${pageStr}\u3002`; blocks.push({type:'short',html:s,plain:s}); }
-    showOut('cb',blocks);
-  } else {
-    if (chk('cb-pinyin')) {
-      blocks.push({type:'bib',html:bib+'<span class="spinner"></span>',plain:bib,label:'書目格式（產生拼音中…）'});
-      showOut('cb',blocks);
-      const nameItems = authors.map((a,i)=>({id:'name'+i,text:a.name,lang:'zh',role:'name'}));
-      const titleItem = [{id:'title',text:title,lang:'zh',role:'title'}];
-      const pubItem = [{id:'pub',text:pub,lang:'zh',role:'pub'}];
-      const placeItem = place?[{id:'place',text:place,lang:'zh',role:'place'}]:[];
-      const map = await getPinyin([...nameItems,...titleItem,...pubItem,...placeItem]);
-      const namesPy = authors.map((_,i)=>map['name'+i]||'?').join(' ');
-      const titlePy = map['title']||'?';
-      const pubPy = map['pub']||'?';
-      const placePy = place?(map['place']||'?'):'';
-      const eng = `(${namesPy}. ${titlePy}. ${placePy?placePy+': ':''}${pubPy}, ${year}.)`;
-      const bibWithPy = bib+'\n'+eng;
-      blocks[0]={type:'bib',html:bibWithPy,plain:bibWithPy,pinyinNote:true};
-      showOut('cb',blocks);
-    } else {
-      blocks.push({type:'bib',html:bib,plain:bib});
-      showOut('cb',blocks);
-    }
-  }
+  // footnote: （出版地：出版者，版次，年份）
+  const pubInner=[place?place+'：'+pub:pub, edition, year].filter(Boolean).join('，');
+  const fn=`${authorStr}，《${title}》（${pubInner}）${pageStr?'，頁'+pageStr:''}。`;
+  // bib: 出版地：出版者，年份，頁數。
+  const bibPub=place?`${place}：${pub}`:pub;
+  const bibParts=[bibPub,edition,year].filter(Boolean).join('，');
+  const bib=`${authorStr}，《${title}》。${bibParts}${pageStr?'，頁'+pageStr:''}。`;
+  const short=`${authorStr}，《${title}》${pageStr?'，頁'+pageStr:''}。`;
+  showOut('cb',[
+    {type:'footnote',html:fn,plain:fn},
+    {type:'short',html:short,plain:short},
+    {type:'bib',html:bib,plain:bib}
+  ]);
 }
 
-// ── CJK ARTICLE ──
-async function genCjkArticle(mode) {
-  const authors=collectAuthors('ca'), title=v('ca-title'), journal=v('ca-journal'),
-        voliss=v('ca-voliss'), year=v('ca-year'), month=v('ca-month'), page=v('ca-page');
+// CJK ARTICLE
+function genCjkArticle() {
+  const authors=collectAuthors('ca'),title=v('ca-title'),journal=v('ca-journal'),
+        voliss=v('ca-voliss'),year=v('ca-year'),month=v('ca-month'),page=v('ca-page');
   if (!authors.length||!title||!journal||!year) return showErr('ca','請填寫必填欄位：作者、篇名、刊物名稱、年份。');
   hideErr('ca');
   const authorStr=cjkAuthorStr(authors);
   const pageStr=page?fmtPageCJK(page):'';
-  const datePart=month?`${year}\u5e74${month}\u6708`:`${year}\u5e74`;
-  const fn=`${authorStr}\uff0c\u3008${title}\u3009\uff0c\u300a${journal}\u300b${voliss}\uff08${datePart}\uff09\uff0c\u9801${pageStr}\u3002`;
-  const bib=`${authorStr}\uff0c\u3008${title}\u3009\u3002\u300a${journal}\u300b${voliss}\uff0c${datePart}\uff0c\u9801${pageStr}\u3002`;
-  const blocks=[];
-  if (mode==='footnote') {
-    blocks.push({type:'footnote',html:fn,plain:fn});
-    if (chk('ca-short')) { const s=`${authorStr}\uff0c\u3008${title}\u3009\uff0c\u9801${pageStr}\u3002`; blocks.push({type:'short',html:s,plain:s}); }
-  } else {
-    if (chk('ca-pinyin')) {
-      blocks.push({type:'bib',html:bib+'<span class="spinner"></span>',plain:bib});
-      showOut('ca',blocks);
-      const items=[...authors.map((a,i)=>({id:'n'+i,text:a.name,lang:'zh',role:'name'})),
-        {id:'title',text:title,lang:'zh',role:'title'},{id:'jn',text:journal,lang:'zh',role:'title'}];
-      const map=await getPinyin(items);
-      const namesPy=authors.map((_,i)=>map['n'+i]||'?').join(' ');
-      const titlePy=map['title']||'?'; const jnPy=map['jn']||'?';
-      const eng=`(${namesPy}. "${titlePy}." ${jnPy}${voliss?', '+voliss:''} [${datePart}]: ${pageStr}.)`;
-      const bibWithPy=bib+'\n'+eng;
-      blocks[0]={type:'bib',html:bibWithPy,plain:bibWithPy,pinyinNote:true};
-      showOut('ca',blocks); return;
-    } else { blocks.push({type:'bib',html:bib,plain:bib}); }
-  }
-  showOut('ca',blocks);
+  const datePart=month?`${year}年${month}月`:`${year}年`;
+  const fn=`${authorStr}，〈${title}〉，《${journal}》${voliss}（${datePart}），頁${pageStr}。`;
+  const bib=`${authorStr}，〈${title}〉，《${journal}》${voliss}，${datePart}，頁${pageStr}。`;
+  const short=`${authorStr}，〈${title}〉，頁${pageStr}。`;
+  showOut('ca',[
+    {type:'footnote',html:fn,plain:fn},
+    {type:'short',html:short,plain:short},
+    {type:'bib',html:bib,plain:bib}
+  ]);
 }
 
-// ── CJK CHAPTER ──
-async function genCjkChapter(mode) {
-  const authors=collectAuthors('cc'), title=v('cc-title'), editor=v('cc-editor'),
-        book=v('cc-book'), place=v('cc-place'), pub=v('cc-pub'), year=v('cc-year'), page=v('cc-page');
+// CJK CHAPTER
+function genCjkChapter() {
+  const authors=collectAuthors('cc'),title=v('cc-title'),editor=v('cc-editor'),
+        book=v('cc-book'),place=v('cc-place'),pub=v('cc-pub'),year=v('cc-year'),page=v('cc-page');
   if (!authors.length||!title||!book||!pub||!year) return showErr('cc','請填寫必填欄位：作者、篇名、書名、出版者、年份。');
   hideErr('cc');
   const authorStr=cjkAuthorStr(authors);
-  const inside=[place?place+'\uff1a'+pub:pub, year+'\u5e74'].join('\uff0c');
   const pageStr=page?fmtPageCJK(page):'';
-  const edPart=editor?editor:'';
-  const fn=`${authorStr}\uff0c\u3008${title}\u3009\uff0c\u6536\u5165${edPart}\u300a${book}\u300b\uff08${inside}\uff09\uff0c\u9801${pageStr}\u3002`;
-  const bib=`${authorStr}\uff0c\u3008${title}\u3009\u3002\u6536\u5165${edPart}\u300a${book}\u300b\u3002${inside}\u3002\u9801${pageStr}\u3002`;
-  const blocks=[];
-  if (mode==='footnote') {
-    blocks.push({type:'footnote',html:fn,plain:fn});
-    if (chk('cc-short')) { const s=`${authorStr}\uff0c\u3008${title}\u3009\uff0c\u9801${pageStr}\u3002`; blocks.push({type:'short',html:s,plain:s}); }
-    showOut('cc',blocks);
-  } else {
-    blocks.push({type:'bib',html:bib,plain:bib});
-    showOut('cc',blocks);
-  }
+  const pubInner=[place?place+'：'+pub:pub,year+'年'].join('，');
+  const bibPub=place?`${place}：${pub}`:pub;
+  const fn=`${authorStr}，〈${title}〉，收入${editor?editor:''}《${book}》（${pubInner}），頁${pageStr}。`;
+  const bib=`${authorStr}，〈${title}〉，收入${editor?editor:''}《${book}》。${bibPub}，${year}，頁${pageStr}。`;
+  const short=`${authorStr}，〈${title}〉，頁${pageStr}。`;
+  showOut('cc',[
+    {type:'footnote',html:fn,plain:fn},
+    {type:'short',html:short,plain:short},
+    {type:'bib',html:bib,plain:bib}
+  ]);
 }
 
-// ── NEWSPAPER ──
-function genCjkNews(mode) {
-  const title=v('cn-title'), paper=v('cn-paper'), date=v('cn-date'), ed=v('cn-edition');
-  if (!paper||!date) return showErr('cn','\u8acb\u586b\u5beb\u5831\u7d19\u540d\u7a31\u53ca\u65e5\u671f\u3002');
+// NEWSPAPER
+function genCjkNews() {
+  const title=v('cn-title'),paper=v('cn-paper'),date=v('cn-date'),ed=v('cn-edition');
+  if (!paper||!date) return showErr('cn','請填寫報紙名稱及日期。');
   hideErr('cn');
-  let fn=(title?`\u3008${title}\u3009\uff0c`:'')+`\u300a${paper}\u300b\uff0c${date}`+(ed?`\uff0c\u7b2c${ed}\u7248`:'')+'\u3002';
-  showOut('cn',[{type:mode==='bib'?'bib':'footnote',html:fn,plain:fn}]);
+  const fn=(title?`〈${title}〉，`:'')+`《${paper}》，${date}`+(ed?`，第${ed}版`:'')+`。`;
+  showOut('cn',[
+    {type:'footnote',html:fn,plain:fn},
+    {type:'bib',html:fn,plain:fn}
+  ]);
 }
 
-// ── ARCHIVE ──
-function genCjkArchive(mode) {
+// ARCHIVE
+function genCjkArchive() {
   const title=v('ar-title'),date=v('ar-date'),file=v('ar-file'),coll=v('ar-collection'),
         inst=v('ar-inst'),arId=v('ar-id'),page=v('ar-page'),url=v('ar-url'),access=v('ar-access');
   if (!title||!coll||!inst) return showErr('ar','請填寫文件標題、全宗文書名稱、典藏機構。');
@@ -727,11 +801,14 @@ function genCjkArchive(mode) {
     (page?`，${page}`:'')+
     (url?`。取用自：${url}`:'')+
     (access?`（${access}點閱）`:'')+'。';
-  showOut('ar',[{type:mode==='bib'?'bib':'footnote',html:mode==='bib'?bib:fn,plain:mode==='bib'?bib:fn}]);
+  showOut('ar',[
+    {type:'footnote',html:fn,plain:fn},
+    {type:'bib',html:bib,plain:bib}
+  ]);
 }
 
-// ── CLASSIC ──
-function genCjkClassic(mode) {
+// CLASSIC
+function genCjkClassic() {
   const author=v('cl-author'),title=v('cl-title'),
         type=document.querySelector('input[name="cl-type"]:checked')?.value,
         origDesc=v('cl-orig-desc'),reprintDesc=v('cl-reprint-desc'),
@@ -739,21 +816,18 @@ function genCjkClassic(mode) {
   if (!title||!page) return showErr('cl','請填寫書名與頁碼。');
   hideErr('cl');
   const vstr=type==='original'?origDesc:reprintDesc;
-  // footnote: commas throughout
-  const fn=(author?author+'，':'')+`《${title}》`+
-    (vstr?`（${vstr}）`:'')+
-    (juan?`，卷${juan}`:'')+
-    `，頁${fmtPageCJK(page)}。`;
-  // bib: period-separated
-  const bib=(author?author+'，':'')+`《${title}》`+
-    (vstr?`（${vstr}）`:'')+'。'+
-    (juan?`卷${juan}。`:'')+
-    `頁${fmtPageCJK(page)}。`;
-  showOut('cl',[{type:mode==='bib'?'bib':'footnote',html:mode==='bib'?bib:fn,plain:mode==='bib'?bib:fn}]);
+  const fn=(author?author+'，':'')+`《${title}》`+(vstr?`（${vstr}）`:'')+
+    (juan?`，卷${juan}`:'')+`，頁${fmtPageCJK(page)}。`;
+  const bib=(author?author+'，':'')+`《${title}》`+(vstr?`（${vstr}）`:'')+'。'+
+    (juan?`卷${juan}。`:'')+`頁${fmtPageCJK(page)}。`;
+  showOut('cl',[
+    {type:'footnote',html:fn,plain:fn},
+    {type:'bib',html:bib,plain:bib}
+  ]);
 }
 
-// ── WEB ──
-function genWeb(mode) {
+// WEB
+function genWeb() {
   const author=v('wb-author'),title=v('wb-title'),site=v('wb-site'),
         source=v('wb-source'),url=v('wb-url'),access=v('wb-access'),
         verb=v('wb-verb'),page=v('wb-page');
@@ -764,150 +838,123 @@ function genWeb(mode) {
     (source?`，${source}`:`，《${site}》`)+
     (pageStr?`，頁${pageStr}`:'')+
     `，取自：${url}。（${access}${verb}）。`;
-  // Bib: title in 〈〉, site in 《》, access date, period-separated
   const bib=(author?author+'，':'')+`〈${title}〉。`+
-    `《${site}》`+
-    (source?`，${source}`:'')+
+    `《${site}》`+(source?`，${source}`:'')+
     (pageStr?`，頁${pageStr}`:'')+
     `。取自：${url}。（${access}${verb}）。`;
-  showOut('wb',[{type:mode==='bib'?'bib':'footnote',html:mode==='bib'?bib:fn,plain:mode==='bib'?bib:fn}]);
+  showOut('wb',[
+    {type:'footnote',html:fn,plain:fn},
+    {type:'bib',html:bib,plain:bib}
+  ]);
 }
 
-// ── WEST BOOK ──
-function genWestBook(mode) {
+// WEST BOOK
+function genWestBook() {
   const authors=collectAuthors('wb2'),title=v('wb2-title'),place=v('wb2-place'),
         pub=v('wb2-pub'),year=v('wb2-year'),page=v('wb2-page');
   if (!authors.length||!title||!pub||!year) return showErr('wb2','Please fill in required fields: author, title, publisher, year.');
   hideErr('wb2');
-  const fa=westFootnoteAuthor(authors), ba=westBibAuthor(authors);
+  const fa=westFootnoteAuthor(authors),ba=westBibAuthor(authors);
   const pageStr=page?fmtPageWest(page):'';
   const inside=place?`${place}: ${pub}`:pub;
-  const fn=`${fa}, <u>${title}</u> (${inside}, ${year}), ${pageStr}`;
-  const fnPlain=`${fa}, ${title} (${inside}, ${year}), ${pageStr}`;
-  const bib=`${ba}. <u>${title}</u>. ${inside}, ${year}.`;
-  const bibPlain=`${ba}. ${title}. ${inside}, ${year}.`;
-  const blocks=[];
-  if (mode==='footnote') {
-    blocks.push({type:'footnote',html:fn,plain:fnPlain,italicNote:true});
-    if (chk('wb2-short')) {
-      const st=title.split(':')[0].trim();
-      const s=`${fa}, <u>${st}</u>, ${pageStr}`;
-      const sp=`${fa}, ${st}, ${pageStr}`;
-      blocks.push({type:'short',html:s,plain:sp,italicNote:true});
-    }
-  } else {
-    blocks.push({type:'bib',html:bib,plain:bibPlain,italicNote:true});
-  }
-  showOut('wb2',blocks);
+  const fn=`${fa}, <u>${title}</u> (${inside}, ${year})${pageStr?', '+pageStr:''}`;
+  const fnPlain=`${fa}, ${title} (${inside}, ${year})${pageStr?', '+pageStr:''}`;
+  const bib=`${ba}. <u>${title}</u>. ${place?place+': ':''}${pub}, ${year}${pageStr?', '+pageStr:''}.`;
+  const bibPlain=`${ba}. ${title}. ${place?place+': ':''}${pub}, ${year}${pageStr?', '+pageStr:''}.`;
+  const st=title.split(':')[0].trim();
+  const short=`${fa}, <u>${st}</u>${pageStr?', '+pageStr:''}`;
+  const shortPlain=`${fa}, ${st}${pageStr?', '+pageStr:''}`;
+  showOut('wb2',[
+    {type:'footnote',html:fn,plain:fnPlain,italicNote:true},
+    {type:'short',html:short,plain:shortPlain,italicNote:true},
+    {type:'bib',html:bib,plain:bibPlain,italicNote:true}
+  ]);
 }
 
-// ── WEST ARTICLE ──
-function genWestArticle(mode) {
+// WEST ARTICLE
+function genWestArticle() {
   const authors=collectAuthors('wa'),title=v('wa-title'),journal=v('wa-journal'),
         voliss=v('wa-voliss'),month=v('wa-month'),year=v('wa-year'),page=v('wa-page');
   if (!authors.length||!title||!journal||!year) return showErr('wa','Please fill in required fields: author, title, journal, year.');
   hideErr('wa');
-  const fa=westFootnoteAuthor(authors), ba=westBibAuthor(authors);
+  const fa=westFootnoteAuthor(authors),ba=westBibAuthor(authors);
   const pageStr=page?fmtPageWest(page):'';
   const datePart=month?`${month} ${year}`:year;
   const vi=voliss?' '+voliss:'';
-  const fn=`${fa}, "${title}," <u>${journal}</u>${vi} (${datePart}): ${pageStr}`;
-  const fnPlain=`${fa}, "${title}," ${journal}${vi} (${datePart}): ${pageStr}`;
-  const bib=`${ba}. "${title}." <u>${journal}</u>${vi?', '+voliss.trim():''} (${datePart}): ${pageStr}`;
-  const bibPlain=`${ba}. "${title}." ${journal}${vi?', '+voliss.trim():''} (${datePart}): ${pageStr}`;
-  const blocks=[];
-  if (mode==='footnote') {
-    blocks.push({type:'footnote',html:fn,plain:fnPlain,italicNote:true});
-    if (chk('wa-short')) { const s=`${fa}, "${title}," ${pageStr}`; blocks.push({type:'short',html:s,plain:s}); }
-  } else {
-    blocks.push({type:'bib',html:bib,plain:bibPlain,italicNote:true});
-  }
-  showOut('wa',blocks);
+  const fn=`${fa}, "${title}," <u>${journal}</u>${vi} (${datePart})${pageStr?': '+pageStr:''}`;
+  const fnPlain=`${fa}, "${title}," ${journal}${vi} (${datePart})${pageStr?': '+pageStr:''}`;
+  const bib=`${ba}. "${title}." <u>${journal}</u>${vi?', '+voliss.trim():''} (${datePart})${pageStr?': '+pageStr:''}.`;
+  const bibPlain=`${ba}. "${title}." ${journal}${vi?', '+voliss.trim():''} (${datePart})${pageStr?': '+pageStr:''}.`;
+  const short=`${fa}, "${title},"${pageStr?' '+pageStr:''}`;
+  showOut('wa',[
+    {type:'footnote',html:fn,plain:fnPlain,italicNote:true},
+    {type:'short',html:short,plain:short},
+    {type:'bib',html:bib,plain:bibPlain,italicNote:true}
+  ]);
 }
 
-// ── WEST THESIS ──
-function genWestThesis(mode) {
+// WEST THESIS
+function genWestThesis() {
   const authors=collectAuthors('wt'),title=v('wt-title'),type=v('wt-type'),
         school=v('wt-school'),year=v('wt-year'),page=v('wt-page');
   if (!authors.length||!title||!school||!year) return showErr('wt','Please fill in required fields: author, title, school, year.');
   hideErr('wt');
-  const fa=westFootnoteAuthor(authors), ba=westBibAuthor(authors);
+  const fa=westFootnoteAuthor(authors),ba=westBibAuthor(authors);
   const pageStr=page?fmtPageWest(page):'';
-  const fn=`${fa}, "${title}" (${type}, ${school}, ${year}), ${pageStr}`;
+  const fn=`${fa}, "${title}" (${type}, ${school}, ${year})${pageStr?', '+pageStr:''}`;
   const bib=`${ba}. "${title}." ${type}, ${school}, ${year}.`;
-  showOut('wt',[{type:mode==='bib'?'bib':'footnote',html:mode==='bib'?bib:fn,plain:mode==='bib'?bib:fn}]);
+  showOut('wt',[
+    {type:'footnote',html:fn,plain:fn},
+    {type:'bib',html:bib,plain:bib}
+  ]);
 }
 
 // ── BULK ──
-async function runBulk() {
+function runBulk() {
   const raw=document.getElementById('bulk-input').value.trim();
   const mode=document.querySelector('input[name="bulk-mode"]:checked')?.value;
-  const withPinyin=chk('bulk-pinyin');
-  if (!raw) return showErr('bulk','\u8acb\u8cbc\u5165\u5f15\u7528\u8cc7\u6599\u3002');
+  if (!raw) return showErr('bulk','請貼入引用資料。');
   hideErr('bulk');
-  const btn=document.getElementById('bulk-btn');
-  btn.disabled=true; btn.innerHTML='轉換中 <span class="spinner"></span>';
-
-  const sysPrompt = mode==='footnote-to-bib'
-    ? `You are a citation formatter for a Taiwanese history journal. Convert each footnote citation to bibliography format.
-Rules for CJK:
-- Books: 作者，《書名》。（出版地：出版者，年份）。頁X–Y。
-- Articles: 作者，〈篇名〉。《刊物》卷期，年月，頁X–Y。
-- Thesis: 作者，〈篇名〉。出版地：學校，年份。頁X–Y。
-- Newspaper: 〈篇名〉，《報名》，日期，第X版。
-- Archive: keep as-is
-- Chapters: 作者，〈篇名〉。收入編者《書名》。出版地：出版者，年份。頁X–Y。
-Rules for Western:
-- Books: LastName, FirstName. Title. Place: Publisher, Year.
-- Articles: LastName, FirstName. "Title." Journal, vol, no. x (Month Year): pp.X–Y.
-- Thesis: LastName, FirstName. "Title." Type, School, Year.
-Page numbers: use en-dash (–) for ranges; for CJK non-consecutive pages use 、; for Western use pp.X–Y.
-If the same author appears in consecutive entries, replace author with ── (but keep pinyin full name if adding pinyin).
-${withPinyin?'After each CJK entry, add romanization on next line in parentheses. Use Wade-Giles for Chinese names (Taiwan convention), Hanyu Pinyin for titles/publishers. Mark with note that verification needed.':''}
-Return ONLY the bibliography entries, preserve order, no numbering.`
-    : `Convert each library catalog entry to Taiwanese history journal bibliography format.
-Format: 作者，《書名》。（出版地：出版者，年份）。
-Rules: replace ' : ' with '：' in title; remove /Author suffix; keep subtitle after ：; add ） after place if split.
-${withPinyin?'After each entry, add romanization in parentheses on next line.':''}
-Return ONLY converted entries, no commentary.`;
-
-  try {
-    const lines = raw.split(/\n{2,}|\n(?=\S)/).map(l=>l.trim()).filter(Boolean);
-    const res=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,
-        system:sysPrompt,messages:[{role:'user',content:lines.join('\n\n')}]})
-    });
-    const data=await res.json();
-    const output=(data.content?.[0]?.text||'').trim();
-    const resultLines=output.split('\n').filter(l=>l.trim());
-    const container=document.getElementById('bulk-results');
-    container.innerHTML='';
-    // Group by double-newline or consecutive
-    const groups=[];let cur=[];
-    resultLines.forEach(l=>{if(l)cur.push(l);else{if(cur.length)groups.push(cur.join('\n'));cur=[];}});
-    if(cur.length)groups.push(cur.join('\n'));
-    (groups.length?groups:resultLines).forEach((entry,i)=>{
-      const card=document.createElement('div');
-      card.className='output-card'; card.style.marginBottom='.6rem';
-      const okId='bk-ok-'+i;
-      const enc=encodeURIComponent(entry);
-      card.innerHTML=`<div class="output-hd"><span>第 ${i+1} 筆</span>
-        <span><button class="copy-btn" onclick="copyText(this,'${okId}')">複製</button>
-        <span class="copy-ok" id="${okId}">已複製！</span></span></div>
-        <div class="output-body" data-plain="${enc}">${entry}</div>`;
-      container.appendChild(card);
-    });
-    if(withPinyin){
-      const n=document.createElement('div');n.className='italic-note';n.style.marginTop='.5rem';
-      n.textContent='⚠ 拼音為 AI 自動轉換，請務必逐條人工核對，尤其人名、地名、專有名詞。';
-      container.appendChild(n);
-    }
-    document.getElementById('bulk-out').style.display='block';
-  } catch(e){ showErr('bulk','轉換失敗：'+e.message); }
-  btn.disabled=false; btn.innerHTML='開始轉換';
+  const lines=raw.split(/\n/).map(l=>l.trim());
+  const entries=[];let cur='';
+  lines.forEach(l=>{ if(!l){if(cur){entries.push(cur.trim());cur='';}}else cur+=(cur?' ':'')+l; });
+  if(cur)entries.push(cur.trim());
+  const results=mode==='footnote-to-bib'?entries.map(convertFootnoteToBib):entries.map(convertLibToBib);
+  const final=applyDashRepeat(results);
+  const container=document.getElementById('bulk-results');
+  container.innerHTML='';
+  final.forEach((entry,i)=>{
+    const card=document.createElement('div');
+    card.className='output-card bib-card';card.style.marginBottom='.6rem';
+    const okId='bk-ok-'+i;
+    const hd2 = document.createElement('div'); hd2.className='output-hd';
+    const sp = document.createElement('span'); sp.textContent='第 '+(i+1)+' 筆';
+    const acts2 = document.createElement('div'); acts2.className='hd-actions';
+    const cp2 = document.createElement('button'); cp2.className='copy-btn'; cp2.textContent='複製';
+    const ok2 = document.createElement('span'); ok2.className='copy-ok'; ok2.id=okId; ok2.textContent='已複製！';
+    const cl2 = document.createElement('button'); cl2.className='add-clip-btn add-clip-bib'; cl2.textContent='＋ 加入書目剪貼簿';
+    const bd2 = document.createElement('div'); bd2.className='output-body'; bd2.textContent=entry;
+    cp2.addEventListener('click',()=>{ navigator.clipboard.writeText(entry).then(()=>{ ok2.style.display='inline'; setTimeout(()=>ok2.style.display='none',2000); }); });
+    cl2.addEventListener('click',()=>{ clipboard.bib.push({plain:entry,html:entry}); renderClip('bib'); updateClipBadge(); cl2.textContent='✓ 已加入'; cl2.disabled=true; setTimeout(()=>{ cl2.textContent='＋ 加入書目剪貼簿'; cl2.disabled=false; },1500); });
+    acts2.appendChild(cp2); acts2.appendChild(cl2); acts2.appendChild(ok2);
+    hd2.appendChild(sp); hd2.appendChild(acts2);
+    card.appendChild(hd2); card.appendChild(bd2);
+    container.appendChild(card);
+  });
+  document.getElementById('bulk-out').style.display='block';
 }
 
+function addAllBulkToClip() {
+  document.querySelectorAll('#bulk-results .output-body').forEach(el=>{
+    const plain=el._plain||el.textContent;
+    clipboard.bib.push({plain,html:plain});
+  });
+  renderClip('bib');updateClipBadge();
+}
+function copyAllBulk(){
+  const items=document.querySelectorAll('#bulk-results .output-body');
+  navigator.clipboard.writeText(Array.from(items).map(el=>el._plain||el.textContent).join('\n'));
+}
 function clearBulk(){
   document.getElementById('bulk-input').value='';
   const out=document.getElementById('bulk-out');
@@ -916,11 +963,65 @@ function clearBulk(){
   hideErr('bulk');
 }
 
-function copyAll(){
-  const items=document.querySelectorAll('#bulk-results .output-body');
-  const text=Array.from(items).map(el=>decodeURIComponent(el.dataset.plain)).join('\n');
-  navigator.clipboard.writeText(text);
+// ── BULK CONVERTERS ──
+function convertFootnoteToBib(s) {
+  if(!s)return s;
+  s=s.replace(/^\d+\s*/,'').trim();
+  if(/^[A-Z][a-zà-ÿ\-]+,\s/.test(s)){
+    let bib=s.replace(/,\s*pp?\.\s*\d[\d–\-,\s]*\.?\s*$/,'').replace(/\(([^)]+)\)/,'$1');
+    bib=bib.replace(/,\s*$/,'');
+    return (bib.endsWith('.')?bib:bib+'.');
+  }
+  const bookM=s.match(/^(.+?)，《(.+?)》[（(]([^）)]+)[）)](?:，頁([\d–\-、\s]+))?。?$/);
+  if(bookM){
+    const[,author,title,pubInfo,page]=bookM;
+    const pageStr=page?`，頁${fmtPageCJK(page.trim())}。`:'。';
+    return `${author}，《${title}》。${pubInfo}${pageStr}`;
+  }
+  const artM=s.match(/^(.+?)，〈(.+?)〉，《(.+?)》([^（(]*)（([^）)]+)）(?:，頁([\d–\-、\s]+))?。?$/);
+  if(artM){
+    const[,author,title,journal,voliss,date,page]=artM;
+    const pageStr=page?`，頁${fmtPageCJK(page.trim())}。`:'。';
+    return `${author}，〈${title}〉，《${journal}》${voliss.trim()}，${date}${pageStr}`;
+  }
+  const chM=s.match(/^(.+?)，〈(.+?)〉，收入(.*)《(.+?)》（([^）)]+)）(?:，頁([\d–\-、\s]+))?。?$/);
+  if(chM){
+    const[,author,title,editor,book,pubInfo,page]=chM;
+    const pageStr=page?`，頁${fmtPageCJK(page.trim())}。`:'。';
+    return `${author}，〈${title}〉，收入${editor}《${book}》。${pubInfo}${pageStr}`;
+  }
+  return s.endsWith('。')||s.endsWith('.')?s:s+'。';
+}
+function convertLibToBib(s){
+  if(!s)return s;
+  const m=s.match(/^(.+?)\.\s+(.+?)\s*\/\s*.+?[著編譯]\.\s*(?:(.+?)\.\s+)?(.+?),\s*(\d{4})\.?$/);
+  if(m){
+    let[,author,titleRaw,,publisher,year]=m;
+    let title=titleRaw.replace(/\s*:\s*/g,'：').trim();
+    return `${author}，《${title}》。${publisher}，${year}。`;
+  }
+  const m2=s.match(/^(.+?)\.\s+(.+?)\s*\/\s*.+?\.\s*(.+?),\s*(\d{4})\.?$/);
+  if(m2){
+    let[,author,titleRaw,publisher,year]=m2;
+    let title=titleRaw.replace(/\s*:\s*/g,'：').trim();
+    return `${author}，《${title}》。${publisher}，${year}。`;
+  }
+  return s;
+}
+function extractCJKAuthor(s){
+  const m=s.match(/^([^，《〈「]+)[，]/);
+  return m?m[1].trim():'';
+}
+function applyDashRepeat(entries){
+  const result=[];let lastAuthor='';
+  entries.forEach(entry=>{
+    const author=extractCJKAuthor(entry);
+    if(author&&author===lastAuthor) result.push(entry.replace(author,'──'));
+    else{result.push(entry);if(author)lastAuthor=author;}
+  });
+  return result;
 }
 </script>
+<script data-goatcounter="https://hyacinthus1108.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body>
 </html>
